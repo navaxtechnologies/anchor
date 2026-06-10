@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "ANCHOR",
+    "slug": "anchor",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "anchor",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0F2A3F"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anchor.app"
+    },
+    "android": {
+      "package": "com.anchor.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0F2A3F"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-asset",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
