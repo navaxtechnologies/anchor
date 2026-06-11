@@ -8,28 +8,51 @@
 // RAW PALETTE — full scales, used by components
 // ─────────────────────────────────────────────
 export const Palette = {
-  // Anchor Teal — still water at dawn. Calm clarity, trust without coldness.
+  // Anchor Teal — still ocean at dawn. Primary identity (Luminous Clarity v2).
   teal: {
-    50: '#F0FDFA',
-    100: '#CCFBF1',
-    200: '#99F6E4',
-    300: '#5EEAD4',
-    400: '#2DD4BF',
-    500: '#14B8A6',
-    600: '#0D9488',
-    700: '#0F766E',
-    900: '#134E4A',
+    25: '#F2FDFB',
+    50: '#E6FAF7',
+    100: '#C2F3EC',
+    200: '#85E7D8',
+    300: '#3DD5C1',
+    400: '#14C4AC',
+    500: '#0EA891',
+    600: '#0B8C78',
+    700: '#087062',
+    800: '#054E44',
+    900: '#032E28',
   },
-  // Sunrise Gold — used sparingly. Pure joy, achievement.
+  // Sunrise Gold — the horizon breaking open. Celebrations only.
   gold: {
-    50: '#FFFBEB',
-    100: '#FEF3C7',
-    200: '#FDE68A',
-    300: '#FCD34D',
-    400: '#FBBF24',
+    25: '#FFFDF5',
+    50: '#FFF9E6',
+    100: '#FFF0B3',
+    200: '#FFE066',
+    300: '#FFC833',
+    400: '#FFB300',
     500: '#F59E0B',
     600: '#D97706',
     700: '#B45309',
+  },
+  // Aurora Violet — deep water and wonder. AI advisor, premium.
+  violet: {
+    50: '#F5F0FF',
+    100: '#EBE0FF',
+    200: '#D4C0FF',
+    300: '#B39DFF',
+    400: '#8B73F5',
+    500: '#6D4FF0',
+    600: '#5438CC',
+    700: '#3D27A8',
+  },
+  // Sage — new leaves, earth after rain. Success and growth.
+  sage: {
+    25: '#F7FDF9',
+    50: '#EDFAF2',
+    100: '#D4F3E0',
+    300: '#72D49A',
+    500: '#22A85A',
+    600: '#198245',
   },
   // Soft Lavender — community, you are not alone.
   lavender: {
@@ -41,24 +64,25 @@ export const Palette = {
     500: '#8B5CF6',
     600: '#7C3AED',
   },
-  // Coral Peach — human warmth, the feeling of being held.
+  // Coral Dawn — skin, breath, presence. Community and care signals.
   coral: {
-    50: '#FFF5F5',
-    100: '#FED7D7',
-    200: '#FEB2B2',
-    300: '#FC8181',
-    400: '#F87171',
+    50: '#FFF5F4',
+    100: '#FFE8E5',
+    200: '#FFC9C2',
+    300: '#FFA599',
+    400: '#FF7D70',
+    500: '#FF5A4A',
   },
-  // Sky Blue — the AI advisor. A calm guide speaking.
+  // Sky — clarity and information.
   sky: {
     50: '#F0F9FF',
-    100: '#E0F2FE',
-    200: '#BAE6FD',
-    300: '#7DD3FC',
-    400: '#38BDF8',
-    500: '#0EA5E9',
-    600: '#0284C7',
-    700: '#0369A1',
+    100: '#DCF0FF',
+    200: '#BAE0FF',
+    300: '#7EC8FF',
+    400: '#38ADFF',
+    500: '#0090F0',
+    600: '#006FC4',
+    700: '#005A9E',
   },
   // Deep Navy — depth and trust. Headings, hero gradients (V2).
   navy: {
@@ -92,14 +116,33 @@ export const Palette = {
   },
 } as const;
 
-// Gradients — hero moments, cards, celebrations.
+// Master gradients — each has a name, a mood, and a purpose.
+// Never used just for color — used for feeling.
+// NOTE (accessibility override): where the spec used teal500→violet500 under
+// white text (~2.8:1), interactive surfaces use the 600/700 ends instead.
 export const Gradients = {
-  sunrise: ['#14B8A6', '#0EA5E9'],
-  warmCard: ['#F0FDF4', '#FAFDF9'],
-  celebrate: ['#FBBF24', '#F59E0B'],
-  community: ['#EDE9FE', '#F0FDF4'],
-  advisor: ['#E0F2FE', '#F0FDFA'],
-  morning: ['#14B8A6', '#38BDF8', '#FBBF24'],
+  /** THE SIGNATURE — dawn water, teal deepening into violet. Hero moments. */
+  anchor: ['#0EA891', '#6D4FF0'],
+  /** Deep variant of the signature — AA-safe under white text (buttons). */
+  anchorDeep: ['#087062', '#4A30B8'],
+  /** Sunrise — the warmth of a new day. Morning card, milestones. */
+  sunrise: ['#FFB300', '#FF7D70', '#0EA891'],
+  /** Dawn mist — ultra-subtle card backgrounds. Almost invisible, alive. */
+  mist: ['#F2FDFB', '#F5F0FF', '#FFFDF5'],
+  /** Deep ocean — AI advisor header, premium screens. */
+  ocean: ['#032E28', '#0B6B58'],
+  /** Celebration — confetti moments and goal completion only. */
+  celebrate: ['#FFB300', '#FF7D70'],
+  /** Glass shimmer — glassmorphism cards. */
+  glass: ['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.75)'],
+} as const;
+
+/** Tinted glow auras beneath floating cards — luminous, never heavy. */
+export const Aura = {
+  teal: 'rgba(14, 168, 145, 0.12)',
+  gold: 'rgba(255, 179, 0, 0.10)',
+  violet: 'rgba(109, 79, 240, 0.10)',
+  coral: 'rgba(255, 125, 112, 0.10)',
 } as const;
 
 // ─────────────────────────────────────────────
@@ -127,79 +170,85 @@ export interface ThemeColors {
   goldSoft: string;
   lavender: string;
   lavenderSoft: string;
+  violet: string;
+  violetSoft: string;
   sky: string;
   skySoft: string;
   overlay: string;
 }
 
-// Light — layered warmth, never clinical white.
+// Light — Luminous Clarity. Warm true white; light radiates from within.
 export const colors: ThemeColors = {
-  primary: Palette.teal[700],      // CTAs, headers — 5:1 on white
+  primary: Palette.teal[700],      // CTAs, headers — ~5.4:1 on white
   primarySoft: Palette.teal[500],  // active states, accents
   accent: Palette.teal[600],
   accentSoft: Palette.teal[50],
 
-  // Crisis: red kept for universal recognition, softened. Calm, not alarm.
-  crisis: '#DC2626',
-  crisisSoft: '#FEF2F2',
-  emergency: '#B91C1C',
+  // Crisis: softened red — urgency without panic. Calm, not alarm.
+  crisis: '#E03838',
+  crisisSoft: '#FFF2F1',
+  emergency: '#C42B2B',
 
-  bg: '#FAFDF9',          // warm white with the tiniest hint of green life
+  bg: '#FDFDFC',                  // warm true white
   surface: '#FFFFFF',
-  surfaceAlt: '#F0FDF4',  // soft sage
+  surfaceAlt: Palette.sage[25],   // soft sage wash
 
   text: Palette.neutral[800],
   textMuted: Palette.neutral[600],
   textInverse: '#FFFFFF',
 
   border: Palette.neutral[200],
-  success: '#16A34A',
-  successSoft: '#DCFCE7',
+  success: Palette.sage[500],
+  successSoft: Palette.sage[50],
   warning: '#CA8A04',
 
   gold: Palette.gold[500],
   goldSoft: Palette.gold[100],
   lavender: Palette.lavender[500],
   lavenderSoft: Palette.lavender[100],
+  violet: Palette.violet[500],
+  violetSoft: Palette.violet[50],
   sky: Palette.sky[500],
   skySoft: Palette.sky[50],
 
-  overlay: 'rgba(20, 184, 166, 0.06)',
+  overlay: 'rgba(14, 168, 145, 0.06)',
 };
 
-// Dark — not inverted light; its own warm identity. Deep forest, never cold black.
+// Dark — "Deep Ocean": underwater at night, where light comes from within.
 export const darkColors: ThemeColors = {
   ...colors,
   primary: Palette.teal[400],
   primarySoft: Palette.teal[300],
   accent: Palette.teal[300],
-  accentSoft: 'rgba(20, 184, 166, 0.14)',
+  accentSoft: 'rgba(14, 168, 145, 0.14)',
 
-  crisis: '#F87171',
-  crisisSoft: '#3A201D',
-  emergency: '#EF4444',
+  crisis: '#FF7B6E',
+  crisisSoft: '#3A1F1C',
+  emergency: '#FF5252',
 
-  bg: '#0F1512',
-  surface: '#1E2D22',
-  surfaceAlt: '#162018',
+  bg: '#090E0D',
+  surface: '#142019',
+  surfaceAlt: '#0D1614',
 
-  text: '#F0FDF4',
-  textMuted: '#A7C4B5',
-  textInverse: '#0F1512',
+  text: '#E8FAF5',
+  textMuted: '#8FBFB0',
+  textInverse: '#090E0D',
 
-  border: '#2A3A2F',
-  success: '#4ADE80',
-  successSoft: '#16341F',
-  warning: '#FCD34D',
+  border: 'rgba(14, 168, 145, 0.18)',
+  success: Palette.sage[300],
+  successSoft: '#11281A',
+  warning: '#FFC833',
 
   gold: Palette.gold[400],
-  goldSoft: 'rgba(251, 191, 36, 0.16)',
+  goldSoft: 'rgba(255, 179, 0, 0.16)',
   lavender: Palette.lavender[300],
   lavenderSoft: 'rgba(167, 139, 250, 0.16)',
+  violet: Palette.violet[300],
+  violetSoft: 'rgba(109, 79, 240, 0.18)',
   sky: Palette.sky[300],
-  skySoft: 'rgba(56, 189, 248, 0.12)',
+  skySoft: 'rgba(56, 173, 255, 0.12)',
 
-  overlay: 'rgba(20, 184, 166, 0.08)',
+  overlay: 'rgba(14, 168, 145, 0.08)',
 };
 
 export type ColorScheme = 'light' | 'dark';

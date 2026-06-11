@@ -169,6 +169,7 @@ const es: TranslationSchema = {
       q6: '¿Qué le da esperanza?',
     },
     progressTitle: 'Su progreso',
+    momentum: 'Su impulso',
     lifeScoreTitle: 'Puntaje de Vida Semanal',
     lifeScoreNote: 'Esto refleja lo que ha puesto en marcha — no es una calificación de su vida.',
     scoreDims: {

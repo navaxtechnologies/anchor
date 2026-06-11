@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button } from '@/components/ui';
 import { WaveBackground } from '@/components/WaveBackground';
+import { ParticleField } from '@/components/ParticleField';
 import { useTheme } from '@/context/AppContext';
 import { useFadeIn } from '@/hooks/useAnimation';
 import { track } from '@/services/analytics';
@@ -44,12 +45,17 @@ export default function Welcome() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.bg }}>
       <WaveBackground />
+      <ParticleField intensity="medium" />
       <View style={{ flex: 1, padding: theme.spacing.lg, justifyContent: 'space-between' }}>
         <View style={{ gap: theme.spacing.lg, marginTop: theme.spacing.xxl }}>
-          {/* Wordmark — bold teal, with a human anchor, not an icon. */}
+          {/* Wordmark — hero weight, confident and unafraid. */}
           <Animated.View style={[heroEntry, { gap: theme.spacing.xs }]}>
-            <AppText size="display" weight="heavy" color={theme.colors.primary}>
-              ANCHOR <AppText size="display">⚓</AppText>
+            <AppText
+              weight="heavy"
+              color={theme.colors.primary}
+              style={{ fontSize: 46, lineHeight: 54, letterSpacing: -1.2 }}
+            >
+              ANCHOR <AppText style={{ fontSize: 42, lineHeight: 54 }}>⚓</AppText>
             </AppText>
           </Animated.View>
 

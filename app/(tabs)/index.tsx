@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button, Card } from '@/components/ui';
+import { LiveScore } from '@/components/LiveScore';
 import { ResourceCard } from '@/components/ResourceCard';
 import { MoodSelector } from '@/components/MoodSelector';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
@@ -220,13 +221,18 @@ function ProgressSection({ documentCount }: { documentCount: number }) {
   });
 
   const recentWins = wins.slice(0, 4);
+  const momentum =
+    ((score.financial + score.organization + score.community + score.wellbeing) / 4) * 100;
 
   return (
-    <Card fadeIndex={3}>
+    <Card fadeIndex={3} elevated>
       <View style={{ gap: theme.spacing.md }}>
         <AppText size="heading" weight="bold">
           {t('home.progressTitle')}
         </AppText>
+
+        {/* The momentum arc — counts up, draws itself. */}
+        <LiveScore score={momentum} label={t('home.momentum')} />
 
         <View style={{ gap: theme.spacing.sm }}>
           <AppText size="small" weight="bold" color={theme.colors.textMuted}>

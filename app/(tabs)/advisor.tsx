@@ -12,6 +12,8 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Speech from 'expo-speech';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Gradients, Palette } from '@/theme';
 import { AppText, Button, Card } from '@/components/ui';
 import { Disclaimer } from '@/components/Disclaimer';
 import { ThinkingDots } from '@/components/ThinkingDots';
@@ -77,7 +79,7 @@ function Bubble({ message, language }: { message: AdvisorMessage; language: stri
       <View
         style={{
           flexShrink: 1,
-          backgroundColor: message.flaggedCrisis ? theme.colors.crisisSoft : theme.colors.skySoft,
+          backgroundColor: message.flaggedCrisis ? theme.colors.crisisSoft : theme.colors.violetSoft,
           borderWidth: message.flaggedCrisis ? 1 : 0,
           borderColor: theme.colors.crisis,
           borderRadius: theme.radius.lg,
@@ -201,6 +203,34 @@ export default function Advisor() {
         keyboardVerticalOffset={90}
       >
         <View style={{ padding: theme.spacing.md, gap: theme.spacing.sm }}>
+          {/* Deep-ocean header — light from within. Signals: most powerful feature. */}
+          <LinearGradient
+            colors={Gradients.ocean as unknown as [string, string]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={{
+              borderRadius: theme.radius.lg,
+              padding: theme.spacing.md,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: theme.spacing.md,
+              borderWidth: 1,
+              borderColor: 'rgba(14, 168, 145, 0.3)',
+            }}
+          >
+            <AppText style={{ fontSize: 28, lineHeight: 36 }}>⚓</AppText>
+            <View style={{ flex: 1 }}>
+              <AppText size="heading" weight="heavy" color="#E8FAF5">
+                {t('advisor.title')}
+              </AppText>
+              {Number.isFinite(aiRemaining) && !limitReached && (
+                <AppText size="tiny" color={Palette.teal[200]}>
+                  {t('advisor.remainingOther', { count: aiRemaining })}
+                </AppText>
+              )}
+            </View>
+          </LinearGradient>
+
           <Disclaimer text={t('advisor.disclaimer')} />
           {showCrisis && (
             <Card style={{ backgroundColor: theme.colors.crisisSoft, borderColor: theme.colors.crisis }}>
@@ -306,11 +336,6 @@ export default function Advisor() {
             </View>
           ) : (
             <>
-              {Number.isFinite(aiRemaining) && (
-                <AppText size="tiny" color={theme.colors.textMuted}>
-                  {t('advisor.remainingOther', { count: aiRemaining })}
-                </AppText>
-              )}
               <View style={{ flexDirection: 'row', gap: theme.spacing.sm, alignItems: 'flex-end' }}>
                 <TextInput
                   placeholder={t('advisor.placeholder')}

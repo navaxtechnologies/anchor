@@ -168,6 +168,7 @@ const en = {
       q6: 'What are you hopeful about?',
     },
     progressTitle: 'Your progress',
+    momentum: 'Your Momentum',
     lifeScoreTitle: 'Weekly Life Score',
     lifeScoreNote: 'This reflects what you’ve set in motion — not a grade on your life.',
     scoreDims: {

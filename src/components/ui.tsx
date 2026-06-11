@@ -12,7 +12,9 @@ import {
   ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/context/AppContext';
+import { Gradients } from '@/theme';
 import { usePressScale, useStaggeredEntry } from '@/hooks/useAnimation';
 import { haptic } from '@/lib/haptics';
 
@@ -135,11 +137,21 @@ export function Button({
             justifyContent: 'center',
             alignSelf: fullWidth ? 'stretch' : 'flex-start',
             opacity: disabled ? 0.5 : 1,
+            overflow: 'hidden',
             ...lift,
           },
           style,
         ]}
       >
+        {/* The signature gradient — dawn water deepening into violet (AA-safe ends). */}
+        {variant === 'primary' && !disabled && theme.scheme === 'light' && (
+          <LinearGradient
+            colors={Gradients.anchorDeep as unknown as [string, string]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          />
+        )}
         {loading ? (
           <ActivityIndicator color={fg[variant]} />
         ) : (
