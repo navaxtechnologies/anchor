@@ -24,7 +24,7 @@ export default function ResourceDetail() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const resource = id ? getResource(id) : undefined;
-  const { isSaved, toggleSaveResource } = useApp();
+  const { isSaved, toggleSaveResource, markResourceContacted, logWin } = useApp();
 
   if (!resource) {
     return (
@@ -35,6 +35,11 @@ export default function ResourceDetail() {
   }
 
   const saved = isSaved(resource.id);
+  const contacted = (action: () => void) => {
+    markResourceContacted(resource.id);
+    logWin('wins.resourceContacted');
+    action();
+  };
 
   return (
     <>
@@ -50,13 +55,16 @@ export default function ResourceDetail() {
 
         {/* Primary actions */}
         <View style={{ gap: theme.spacing.sm }}>
-          <Button title={`${t('common.call')}  ${resource.phone}`} onPress={() => dial(resource.phone)} />
+          <Button
+            title={`${t('common.call')}  ${resource.phone}`}
+            onPress={() => contacted(() => dial(resource.phone))}
+          />
           <View style={{ flexDirection: 'row', gap: theme.spacing.sm }}>
             <Button
               title={t('common.directions')}
               variant="secondary"
               fullWidth={false}
-              onPress={() => openDirections(resource)}
+              onPress={() => contacted(() => openDirections(resource))}
               style={{ flex: 1 }}
             />
             <Button

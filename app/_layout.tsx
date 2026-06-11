@@ -31,7 +31,10 @@ function RootStack() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding/welcome" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding/language" options={{ headerShown: false }} />
-      <Stack.Screen name="onboarding/simple-mode" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/intent" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/accessibility" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/priorities" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/create" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="crisis/index" options={{ presentation: 'modal' }} />
       <Stack.Screen name="crisis/[category]" />
@@ -39,6 +42,7 @@ function RootStack() {
       <Stack.Screen name="circles" />
       <Stack.Screen name="subscribe" />
       <Stack.Screen name="settings" />
+      <Stack.Screen name="legal/[doc]" />
     </Stack>
   );
 }

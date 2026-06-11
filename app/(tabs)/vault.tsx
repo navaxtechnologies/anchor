@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { AppText, Button, Card, Pill, ScreenContainer } from '@/components/ui';
+import { Skeleton } from '@/components/Skeleton';
 import { useApp, useTheme } from '@/context/AppContext';
 import { addDocument, listDocuments, removeDocument } from '@/services/vault';
 import { track } from '@/services/analytics';
@@ -17,12 +18,16 @@ export default function Vault() {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
-  const { limits } = useApp();
+  const { limits, logWin } = useApp();
 
   const [docs, setDocs] = useState<DocumentMeta[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void listDocuments().then(setDocs);
+    void listDocuments().then((d) => {
+      setDocs(d);
+      setLoading(false);
+    });
   }, []);
 
   const atLimit = docs.length >= limits.maxDocuments;
@@ -37,6 +42,7 @@ export default function Vault() {
       sizeBytes: 120_000,
     });
     track('document_added', { category });
+    logWin('wins.document');
     setDocs((d) => [doc, ...d]);
   };
 
@@ -79,7 +85,13 @@ export default function Vault() {
         <Button title={t('vault.add')} onPress={onAdd} />
       )}
 
-      {docs.length === 0 ? (
+      {loading ? (
+        <View style={{ gap: theme.spacing.sm }}>
+          <Skeleton />
+          <Skeleton />
+          <Skeleton />
+        </View>
+      ) : docs.length === 0 ? (
         <Card>
           <AppText size="body" color={theme.colors.textMuted}>
             {t('vault.empty')}

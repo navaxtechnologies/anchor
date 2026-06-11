@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { AppText, Button, Card, Pill, ScreenContainer } from '@/components/ui';
+import { TrustStrip } from '@/components/TrustStrip';
 import { useApp, useTheme } from '@/context/AppContext';
 import { PLAN_PRICING, restorePurchases, startCheckout } from '@/services/stripe';
 import { track } from '@/services/analytics';
@@ -107,6 +108,7 @@ export default function Subscribe() {
         </AppText>
 
         <Button title={t('subscribe.restore')} variant="ghost" onPress={onRestore} />
+        <TrustStrip />
       </ScreenContainer>
     </>
   );

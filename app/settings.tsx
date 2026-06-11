@@ -4,6 +4,7 @@ import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { AppText, Button, Card, Divider, ScreenContainer } from '@/components/ui';
 import { Disclaimer } from '@/components/Disclaimer';
+import { TrustStrip } from '@/components/TrustStrip';
 import { useApp, useTheme } from '@/context/AppContext';
 import type { Language } from '@/types';
 
@@ -49,6 +50,10 @@ export default function Settings() {
     setLanguage,
     simpleMode,
     setSimpleMode,
+    highContrast,
+    setHighContrast,
+    dyslexiaMode,
+    setDyslexiaMode,
     rememberContext,
     setRememberContext,
     analyticsEnabled,
@@ -84,6 +89,20 @@ export default function Settings() {
             />
             <Divider />
             <Toggle
+              label={t('settings.highContrast')}
+              hint={t('settings.highContrastHint')}
+              value={highContrast}
+              onChange={setHighContrast}
+            />
+            <Divider />
+            <Toggle
+              label={t('settings.dyslexia')}
+              hint={t('settings.dyslexiaHint')}
+              value={dyslexiaMode}
+              onChange={setDyslexiaMode}
+            />
+            <Divider />
+            <Toggle
               label={t('settings.rememberContext')}
               hint={t('settings.rememberContextHint')}
               value={rememberContext}
@@ -103,6 +122,26 @@ export default function Settings() {
           {t('settings.privacyTitle')}
         </AppText>
         <Disclaimer text={t('settings.privacyBody')} />
+
+        <AppText size="heading" weight="bold">
+          {t('settings.legalTitle')}
+        </AppText>
+        <Card>
+          <View style={{ gap: theme.spacing.sm }}>
+            {(['terms', 'privacy', 'guidelines', 'aiDisclaimer'] as const).map((doc, i) => (
+              <React.Fragment key={doc}>
+                {i > 0 && <Divider />}
+                <Button
+                  title={t(`legal.${doc}`)}
+                  variant="ghost"
+                  onPress={() => router.push(`/legal/${doc}` as never)}
+                />
+              </React.Fragment>
+            ))}
+          </View>
+        </Card>
+
+        <TrustStrip />
 
         <Button
           title={t('settings.deleteData')}

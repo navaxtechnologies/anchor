@@ -38,7 +38,7 @@ export default function LanguageSelect() {
                 key={opt.code}
                 onPress={() => {
                   setLanguage(opt.code);
-                  router.push('/onboarding/simple-mode');
+                  router.push('/onboarding/intent');
                 }}
                 accessibilityLabel={opt.label}
                 style={{

@@ -12,7 +12,15 @@ import { setAnalyticsEnabled, track } from '@/services/analytics';
 import { setLanguage as applyLanguage, initI18n } from '@/i18n';
 import { buildTheme, type Theme } from '@/theme';
 import { limitsFor } from '@/config/limits';
-import type { CheckIn, Language, Tier } from '@/types';
+import type {
+  CheckIn,
+  IntentKey,
+  Language,
+  PriorityKey,
+  Reflection,
+  Tier,
+  Win,
+} from '@/types';
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
@@ -27,6 +35,8 @@ interface PersistedState {
   onboarded: boolean;
   language: Language;
   simpleMode: boolean;
+  highContrast: boolean;
+  dyslexiaMode: boolean;
   tier: Tier;
   rememberContext: boolean;
   analyticsEnabled: boolean;
@@ -34,12 +44,21 @@ interface PersistedState {
   joinedCircleIds: string[];
   aiUsage: AiUsage;
   checkIns: CheckIn[];
+  // V2 — personalization + engagement
+  intents: IntentKey[];
+  priorities: PriorityKey[];
+  wins: Win[];
+  reflections: Reflection[];
+  /** Resources the user actually called / opened directions to. */
+  contactedResourceIds: string[];
 }
 
 const DEFAULT_STATE: PersistedState = {
   onboarded: false,
   language: 'en',
   simpleMode: false,
+  highContrast: false,
+  dyslexiaMode: false,
   tier: 'free',
   rememberContext: false,
   analyticsEnabled: true,
@@ -47,6 +66,11 @@ const DEFAULT_STATE: PersistedState = {
   joinedCircleIds: [],
   aiUsage: { date: todayStr(), count: 0 },
   checkIns: [],
+  intents: [],
+  priorities: [],
+  wins: [],
+  reflections: [],
+  contactedResourceIds: [],
 };
 
 interface AppContextValue extends PersistedState {
@@ -58,6 +82,15 @@ interface AppContextValue extends PersistedState {
   // actions
   setLanguage: (l: Language) => void;
   setSimpleMode: (on: boolean) => void;
+  setHighContrast: (on: boolean) => void;
+  setDyslexiaMode: (on: boolean) => void;
+  setIntents: (intents: IntentKey[]) => void;
+  setPriorities: (priorities: PriorityKey[]) => void;
+  /** Log a celebrated moment. De-dupes per labelKey per day. */
+  logWin: (labelKey: string) => void;
+  answerReflection: (questionIndex: number, answer: string) => void;
+  todaysReflection: Reflection | undefined;
+  markResourceContacted: (id: string) => void;
   completeOnboarding: () => void;
   setTier: (t: Tier) => void;
   toggleSaveResource: (id: string) => void;
@@ -108,8 +141,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const scheme = useColorScheme();
   const theme = useMemo(
-    () => buildTheme(state.simpleMode, scheme === 'dark' ? 'dark' : 'light'),
-    [state.simpleMode, scheme]
+    () =>
+      buildTheme(
+        state.simpleMode,
+        scheme === 'dark' ? 'dark' : 'light',
+        state.highContrast,
+        state.dyslexiaMode
+      ),
+    [state.simpleMode, scheme, state.highContrast, state.dyslexiaMode]
   );
   const limits = useMemo(() => limitsFor(state.tier), [state.tier]);
   const aiRemaining = Math.max(0, limits.aiQuestionsPerDay - state.aiUsage.count);
@@ -128,6 +167,60 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, simpleMode: on }));
   }, []);
 
+  const setHighContrast = useCallback((on: boolean) => {
+    setState((s) => ({ ...s, highContrast: on }));
+  }, []);
+
+  const setDyslexiaMode = useCallback((on: boolean) => {
+    setState((s) => ({ ...s, dyslexiaMode: on }));
+  }, []);
+
+  const setIntents = useCallback((intents: IntentKey[]) => {
+    setState((s) => ({ ...s, intents }));
+  }, []);
+
+  const setPriorities = useCallback((priorities: PriorityKey[]) => {
+    setState((s) => ({ ...s, priorities }));
+  }, []);
+
+  const logWin = useCallback((labelKey: string) => {
+    const date = todayStr();
+    setState((s) => {
+      if (s.wins.some((w) => w.labelKey === labelKey && w.date === date)) return s;
+      const win: Win = {
+        id: `win-${date}-${labelKey}`,
+        labelKey,
+        date,
+        createdAt: new Date().toISOString(),
+      };
+      return { ...s, wins: [win, ...s.wins].slice(0, 200) };
+    });
+  }, []);
+
+  const answerReflection = useCallback((questionIndex: number, answer: string) => {
+    const date = todayStr();
+    setState((s) => ({
+      ...s,
+      reflections: [
+        { date, questionIndex, answer, createdAt: new Date().toISOString() },
+        ...s.reflections.filter((r) => r.date !== date),
+      ].slice(0, 365),
+    }));
+  }, []);
+
+  const todaysReflection = useMemo(
+    () => state.reflections.find((r) => r.date === todayStr()),
+    [state.reflections]
+  );
+
+  const markResourceContacted = useCallback((id: string) => {
+    setState((s) =>
+      s.contactedResourceIds.includes(id)
+        ? s
+        : { ...s, contactedResourceIds: [id, ...s.contactedResourceIds] }
+    );
+  }, []);
+
   const completeOnboarding = useCallback(() => {
     track('onboarding_complete');
     setState((s) => ({ ...s, onboarded: true }));
@@ -138,18 +231,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, tier: t }));
   }, []);
 
-  const toggleSaveResource = useCallback((id: string) => {
-    setState((s) => {
-      const has = s.savedResourceIds.includes(id);
-      if (!has) track('resource_saved', { id });
-      return {
+  const toggleSaveResource = useCallback(
+    (id: string) => {
+      const has = state.savedResourceIds.includes(id);
+      if (!has) {
+        track('resource_saved', { id });
+        logWin('wins.resourceSaved');
+      }
+      setState((s) => ({
         ...s,
         savedResourceIds: has
           ? s.savedResourceIds.filter((x) => x !== id)
           : [id, ...s.savedResourceIds],
-      };
-    });
-  }, []);
+      }));
+    },
+    [state.savedResourceIds, logWin]
+  );
 
   const isSaved = useCallback(
     (id: string) => state.savedResourceIds.includes(id),
@@ -167,10 +264,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return false; // blocked by tier limit
       }
       track('circle_joined', { id });
+      logWin('wins.circleJoined');
       setState((s) => ({ ...s, joinedCircleIds: [id, ...s.joinedCircleIds] }));
       return true;
     },
-    [state.joinedCircleIds, limits.maxCircles]
+    [state.joinedCircleIds, limits.maxCircles, logWin]
   );
 
   const canAskAi = useCallback(() => aiRemaining > 0, [aiRemaining]);
@@ -223,6 +321,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     todaysCheckIn,
     setLanguage,
     setSimpleMode,
+    setHighContrast,
+    setDyslexiaMode,
+    setIntents,
+    setPriorities,
+    logWin,
+    answerReflection,
+    todaysReflection,
+    markResourceContacted,
     completeOnboarding,
     setTier,
     toggleSaveResource,

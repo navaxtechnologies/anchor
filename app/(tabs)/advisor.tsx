@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Speech from 'expo-speech';
 import { AppText, Button, Card } from '@/components/ui';
 import { Disclaimer } from '@/components/Disclaimer';
 import { ThinkingDots } from '@/components/ThinkingDots';
@@ -20,9 +21,26 @@ import { haptic } from '@/lib/haptics';
 import { track } from '@/services/analytics';
 import type { AdvisorMessage } from '@/types';
 
-function Bubble({ message }: { message: AdvisorMessage }) {
+// Keyword → resource-category follow-up for the last AI reply.
+function followUpFor(content: string): { labelKey: string; category: string } | null {
+  const t = content.toLowerCase();
+  if (/food|comida|pantry|despensa|snap/.test(t)) return { labelKey: 'advisor.followUpFood', category: 'food' };
+  if (/hous|rent|shelter|vivienda|renta|refugio/.test(t)) return { labelKey: 'advisor.followUpHousing', category: 'housing' };
+  if (/job|work|résumé|resume|empleo|trabajo/.test(t)) return { labelKey: 'advisor.followUpJobs', category: 'employment' };
+  if (/legal|attorney|abogado|court|corte/.test(t)) return { labelKey: 'advisor.followUpLegal', category: 'legal' };
+  if (/counsel|mental|consejer|salud mental/.test(t)) return { labelKey: 'advisor.followUpMental', category: 'mental_health' };
+  return null;
+}
+
+function Bubble({ message, language }: { message: AdvisorMessage; language: string }) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const mine = message.role === 'user';
+
+  const speak = () => {
+    Speech.stop();
+    Speech.speak(message.content, { language: language === 'es' ? 'es-MX' : 'en-US', rate: 0.95 });
+  };
 
   if (mine) {
     return (
@@ -65,9 +83,20 @@ function Bubble({ message }: { message: AdvisorMessage }) {
           borderRadius: theme.radius.lg,
           borderBottomLeftRadius: 4,
           padding: theme.spacing.md,
+          gap: 6,
         }}
       >
         <AppText size="body">{message.content}</AppText>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('advisor.listen')}
+          onPress={speak}
+          style={({ pressed }) => ({ alignSelf: 'flex-start', opacity: pressed ? 0.6 : 1 })}
+        >
+          <AppText size="tiny" weight="medium" color={theme.colors.sky}>
+            🔊 {t('advisor.listen')}
+          </AppText>
+        </Pressable>
       </View>
     </View>
   );
@@ -192,11 +221,29 @@ export default function Advisor() {
           ref={listRef}
           data={messages}
           keyExtractor={(m) => m.id}
-          renderItem={({ item }) => <Bubble message={item} />}
+          renderItem={({ item }) => <Bubble message={item} language={language} />}
           contentContainerStyle={{ paddingHorizontal: theme.spacing.md, paddingBottom: theme.spacing.md }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
           ListFooterComponent={thinking ? <ThinkingDots /> : null}
         />
+
+        {/* Follow-up recommendation — concrete next step from the last reply. */}
+        {(() => {
+          const last = messages[messages.length - 1];
+          const follow =
+            last?.role === 'assistant' && !last.flaggedCrisis && hasUserMessage
+              ? followUpFor(last.content)
+              : null;
+          if (!follow || thinking) return null;
+          return (
+            <View style={{ paddingHorizontal: theme.spacing.md, paddingBottom: theme.spacing.sm, flexDirection: 'row' }}>
+              <SuggestionChip
+                label={`📍 ${t(follow.labelKey)}`}
+                onPress={() => router.push(`/(tabs)/resources?category=${follow.category}` as never)}
+              />
+            </View>
+          );
+        })()}
 
         {/* Suggested first questions — inviting, tappable. */}
         {!hasUserMessage && !limitReached && (

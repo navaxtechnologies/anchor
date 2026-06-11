@@ -60,6 +60,22 @@ export const Palette = {
     600: '#0284C7',
     700: '#0369A1',
   },
+  // Deep Navy — depth and trust. Headings, hero gradients (V2).
+  navy: {
+    50: '#F0F5FA',
+    300: '#7896B5',
+    500: '#2C4A68',
+    700: '#1B344F',
+    800: '#142A40',
+    900: '#0F2233',
+  },
+  // Warm Sand / Soft Ivory — grounded warmth (V2).
+  sand: {
+    50: '#FBF8F1',
+    100: '#F6F1E7',
+    200: '#EDE4D3',
+    300: '#DCCDB4',
+  },
   // Warm neutrals — never cold gray.
   neutral: {
     0: '#FFFFFF',
@@ -234,6 +250,15 @@ export function minTapHeight(simpleMode: boolean) {
   return simpleMode ? 64 : 52;
 }
 
+export interface ThemeOptions {
+  simpleMode: boolean;
+  scheme: ColorScheme;
+  /** Stronger text/border contrast for low-vision users. */
+  highContrast: boolean;
+  /** Dyslexia-friendly reading: wider letter spacing + taller lines. */
+  dyslexiaMode: boolean;
+}
+
 export interface Theme {
   colors: ThemeColors;
   scheme: ColorScheme;
@@ -241,17 +266,43 @@ export interface Theme {
   spacing: typeof spacing;
   radius: typeof radius;
   simpleMode: boolean;
+  highContrast: boolean;
+  dyslexiaMode: boolean;
+  /** Extra letter spacing applied to body text (dyslexia mode). */
+  letterSpacing: number;
+  /** Line-height multiplier (dyslexia mode reads better with taller lines). */
+  lineHeightMult: number;
   tapHeight: number;
 }
 
-export function buildTheme(simpleMode: boolean, scheme: ColorScheme = 'light'): Theme {
+export function buildTheme(
+  simpleMode: boolean,
+  scheme: ColorScheme = 'light',
+  highContrast = false,
+  dyslexiaMode = false
+): Theme {
+  const base = scheme === 'dark' ? darkColors : colors;
+  const themeColors: ThemeColors = highContrast
+    ? {
+        ...base,
+        text: scheme === 'dark' ? '#FFFFFF' : '#000000',
+        textMuted: scheme === 'dark' ? '#D8E8DE' : Palette.neutral[700],
+        border: scheme === 'dark' ? '#4A5C50' : Palette.neutral[400],
+        primary: scheme === 'dark' ? Palette.teal[300] : Palette.navy[800],
+      }
+    : base;
+
   return {
-    colors: scheme === 'dark' ? darkColors : colors,
+    colors: themeColors,
     scheme,
     type: typography(simpleMode),
     spacing,
     radius,
     simpleMode,
+    highContrast,
+    dyslexiaMode,
+    letterSpacing: dyslexiaMode ? 0.5 : 0,
+    lineHeightMult: dyslexiaMode ? 1.65 : 1.4,
     tapHeight: minTapHeight(simpleMode),
   };
 }

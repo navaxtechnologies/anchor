@@ -41,11 +41,12 @@ export function AppText({
       style={[
         {
           fontSize: theme.type[size],
-          lineHeight: theme.type[size] * 1.4,
+          lineHeight: theme.type[size] * theme.lineHeightMult,
           color: color ?? theme.colors.text,
           fontWeight,
           textAlign: center ? 'center' : 'left',
-          letterSpacing: size === 'display' || size === 'title' ? -0.3 : 0,
+          letterSpacing:
+            theme.letterSpacing || (size === 'display' || size === 'title' ? -0.3 : 0),
         },
         style,
       ]}

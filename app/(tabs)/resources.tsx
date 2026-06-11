@@ -7,6 +7,7 @@ import { ResourceCard } from '@/components/ResourceCard';
 import { useTheme } from '@/context/AppContext';
 import { resources } from '@/data/resources';
 import { categoryEmoji } from '@/lib/categories';
+import { isOpenNow } from '@/lib/openNow';
 import type { ResourceCategory } from '@/types';
 
 const CATEGORIES: ResourceCategory[] = [
@@ -57,6 +58,8 @@ export default function Resources() {
 
   const [category, setCategory] = useState<ResourceCategory | null>(initial);
   const [query, setQuery] = useState('');
+  const [openOnly, setOpenOnly] = useState(false);
+  const [spanishOnly, setSpanishOnly] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -66,9 +69,12 @@ export default function Resources() {
         !q ||
         r.name.toLowerCase().includes(q) ||
         r.description.toLowerCase().includes(q);
-      return catOk && qOk;
+      const openOk = !openOnly || isOpenNow(r.hours);
+      const langOk =
+        !spanishOnly || r.languages.some((l) => l.toLowerCase().includes('spanish') || l.toLowerCase().includes('español'));
+      return catOk && qOk && openOk && langOk;
     });
-  }, [category, query]);
+  }, [category, query, openOnly, spanishOnly]);
 
   return (
     <ScreenContainer scroll>
@@ -95,6 +101,25 @@ export default function Resources() {
           color: theme.colors.text,
         }}
       />
+
+      {/* Practical filters — open now (approximate) and Spanish-speaking. */}
+      <View style={{ flexDirection: 'row' }}>
+        <Chip
+          label={`🕐 ${t('resources.filterOpenNow')}`}
+          active={openOnly}
+          onPress={() => setOpenOnly(!openOnly)}
+        />
+        <Chip
+          label={`🗣️ ${t('resources.filterSpanish')}`}
+          active={spanishOnly}
+          onPress={() => setSpanishOnly(!spanishOnly)}
+        />
+      </View>
+      {openOnly && (
+        <AppText size="tiny" color={theme.colors.textMuted}>
+          {t('resources.openNowApprox')}
+        </AppText>
+      )}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <Chip label={t('resources.allCategories')} active={!category} onPress={() => setCategory(null)} />

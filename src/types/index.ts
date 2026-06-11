@@ -106,6 +106,42 @@ export interface AdvisorMessage {
   flaggedCrisis?: boolean;
 }
 
+/** "What brings you here today?" — onboarding intent. */
+export type IntentKey =
+  | 'money'
+  | 'health'
+  | 'housing'
+  | 'family'
+  | 'career'
+  | 'community'
+  | 'organizing';
+
+/** Life priorities chosen during onboarding — double as active goals. */
+export type PriorityKey =
+  | 'reduce_debt'
+  | 'find_assistance'
+  | 'mental_health'
+  | 'organize_documents'
+  | 'build_stability'
+  | 'start_business';
+
+/** A celebrated moment — small wins matter. */
+export interface Win {
+  id: string;
+  /** i18n key describing the win, e.g. 'wins.checkIn'. */
+  labelKey: string;
+  date: string; // YYYY-MM-DD
+  createdAt: string;
+}
+
+export interface Reflection {
+  date: string; // YYYY-MM-DD
+  /** Index into the rotating question list (stable per day). */
+  questionIndex: number;
+  answer: string;
+  createdAt: string;
+}
+
 export interface Profile {
   id: string;
   language: Language;

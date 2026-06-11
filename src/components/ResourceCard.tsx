@@ -14,8 +14,14 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
-  const { isSaved, toggleSaveResource } = useApp();
+  const { isSaved, toggleSaveResource, markResourceContacted, logWin } = useApp();
   const saved = isSaved(resource.id);
+
+  const contacted = (action: () => void) => {
+    markResourceContacted(resource.id);
+    logWin('wins.resourceContacted');
+    action();
+  };
 
   const openDetail = () => {
     track('resource_viewed', { id: resource.id });
@@ -51,14 +57,14 @@ export function ResourceCard({ resource }: { resource: Resource }) {
             title={t('common.call')}
             variant="primary"
             fullWidth={false}
-            onPress={() => dial(resource.phone)}
+            onPress={() => contacted(() => dial(resource.phone))}
             style={{ flex: 1 }}
           />
           <Button
             title={t('common.directions')}
             variant="secondary"
             fullWidth={false}
-            onPress={() => openDirections(resource)}
+            onPress={() => contacted(() => openDirections(resource))}
             style={{ flex: 1 }}
           />
           <Button
