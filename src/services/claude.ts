@@ -105,9 +105,52 @@ function mockReply(userText: string, ctx: AdvisorContext): string {
   );
 }
 
+// ─── M2 server integration (live Claude via the Railway proxy) ──────────────
+const M2_URL = process.env.EXPO_PUBLIC_M2_URL;
+const APP_SECRET = process.env.EXPO_PUBLIC_APP_SECRET;
+
+export const m2Configured = !!M2_URL && !!APP_SECRET;
+
+async function callM2(
+  userText: string,
+  ctx: AdvisorContext
+): Promise<{ content: string; crisis: boolean } | null> {
+  try {
+    const history = ctx.history
+      .filter((m) => m.role === 'user' || m.role === 'assistant')
+      .slice(-10)
+      .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content.slice(0, 1000) }));
+
+    const res = await fetch(`${M2_URL}/advisor`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-anchor-secret': APP_SECRET as string,
+      },
+      body: JSON.stringify({ message: userText, history, language: ctx.language }),
+    });
+
+    const data = (await res.json()) as {
+      ok: boolean;
+      message: string;
+      crisis?: { level: string; category: string };
+    };
+
+    if (!data.message) return null;
+    return {
+      content: data.message,
+      crisis: data.crisis?.level === 'high',
+    };
+  } catch {
+    // Network/server failure → caller falls back to the local mock.
+    return null;
+  }
+}
+
 /**
  * Generate an advisor reply. Returns a crisis flag so the UI can hard-route.
- * In production this calls the server proxy; the mock is deterministic + safe.
+ * Defense in depth: local crisis detection runs FIRST (works offline, instant);
+ * the M2 server re-checks server-side. Mock replies remain the offline fallback.
  */
 export async function generateReply(
   userText: string,
@@ -122,7 +165,14 @@ export async function generateReply(
           : 'It sounds like you may be going through something serious. Your safety comes first. Tap “Get help now,” or call 988. If you are in danger, call 911.',
     };
   }
-  // Simulate latency so the UI "thinking" state is exercised.
+
+  // Live advisor via M2 when configured.
+  if (m2Configured) {
+    const live = await callM2(userText, ctx);
+    if (live) return live;
+  }
+
+  // Offline / unconfigured fallback — deterministic, on-tone mock.
   await new Promise((r) => setTimeout(r, 350));
   return { crisis: false, content: mockReply(userText, ctx) };
 }
