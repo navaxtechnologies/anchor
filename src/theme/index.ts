@@ -251,7 +251,61 @@ export const darkColors: ThemeColors = {
   overlay: 'rgba(14, 168, 145, 0.08)',
 };
 
-export type ColorScheme = 'light' | 'dark';
+// ─────────────────────────────────────────────
+// DEEP NAVIGATION (v3) — bioluminescent ocean floor. Light from within.
+// Mapped onto the semantic theme so every screen reskins at once.
+// Accessibility override of the v3 spec: body text uses light.bright (#E8F5F2,
+// ~14:1 on the void) not the spec's dim teal, and button labels use dark-on-
+// biolume — so a scared 2am reader can still read it.
+// ─────────────────────────────────────────────
+export const Biolume = {
+  void: { deepest: '#020B09', deep: '#051410', mid: '#091F19', surface: '#0D2920', rim: '#112F25', haze: '#1A4035' },
+  teal: { core: '#00E5CC', bright: '#00C4AD', mid: '#009E8A', dim: '#007A6B', ghost: '#00332D' },
+  glow: { soft: 'rgba(0,229,204,0.08)', mid: 'rgba(0,229,204,0.15)', hard: 'rgba(0,229,204,0.35)' },
+  light: { pure: '#FFFFFF', bright: '#E8F5F2', mid: '#9BC4BC', dim: '#527A73' },
+  aurora: { violet: '#7B4FFF', blue: '#3B7FFF', gold: '#FFB800' },
+} as const;
+
+export const deepColors: ThemeColors = {
+  ...colors,
+  primary: Biolume.teal.bright,      // CTAs — bright biolume
+  primarySoft: Biolume.teal.core,    // peak glow
+  accent: Biolume.teal.mid,
+  accentSoft: Biolume.glow.soft,     // faint teal card wash
+
+  crisis: '#FF6B6B',
+  crisisSoft: 'rgba(255,107,107,0.16)',
+  emergency: '#FF4757',
+
+  bg: Biolume.void.deep,
+  surface: Biolume.void.surface,
+  surfaceAlt: Biolume.void.deepest,
+
+  text: Biolume.light.bright,        // ~14:1 on void.deep
+  textMuted: Biolume.light.mid,      // readable, not the spec's dim
+  textInverse: Biolume.void.deepest, // dark text on bright biolume buttons
+
+  border: Biolume.void.rim,
+  success: '#00E5A0',
+  successSoft: 'rgba(0,229,160,0.14)',
+  warning: Biolume.aurora.gold,
+
+  gold: Biolume.aurora.gold,
+  goldSoft: 'rgba(255,184,0,0.16)',
+  lavender: Biolume.aurora.violet,
+  lavenderSoft: 'rgba(123,79,255,0.16)',
+  violet: Biolume.aurora.violet,
+  violetSoft: 'rgba(123,79,255,0.16)',
+  sky: Biolume.aurora.blue,
+  skySoft: 'rgba(59,127,255,0.14)',
+
+  overlay: Biolume.glow.soft,
+};
+
+export type ColorScheme = 'light' | 'dark' | 'deep';
+
+// Branch flag: force Deep Navigation for the parallel preview build.
+export const DEEP_NAVIGATION = true;
 
 // ─────────────────────────────────────────────
 // TYPOGRAPHY — human, legible. Simple Mode scales up.
@@ -330,14 +384,16 @@ export function buildTheme(
   highContrast = false,
   dyslexiaMode = false
 ): Theme {
-  const base = scheme === 'dark' ? darkColors : colors;
+  const base =
+    scheme === 'deep' ? deepColors : scheme === 'dark' ? darkColors : colors;
+  const isDark = scheme === 'dark' || scheme === 'deep';
   const themeColors: ThemeColors = highContrast
     ? {
         ...base,
-        text: scheme === 'dark' ? '#FFFFFF' : '#000000',
-        textMuted: scheme === 'dark' ? '#D8E8DE' : Palette.neutral[700],
-        border: scheme === 'dark' ? '#4A5C50' : Palette.neutral[400],
-        primary: scheme === 'dark' ? Palette.teal[300] : Palette.navy[800],
+        text: isDark ? '#FFFFFF' : '#000000',
+        textMuted: isDark ? '#D8E8DE' : Palette.neutral[700],
+        border: isDark ? '#4A5C50' : Palette.neutral[400],
+        primary: scheme === 'deep' ? Biolume.teal.core : isDark ? Palette.teal[300] : Palette.navy[800],
       }
     : base;
 

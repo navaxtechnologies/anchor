@@ -22,8 +22,15 @@ function RootStack() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: theme.colors.primary },
-        headerTintColor: theme.scheme === 'dark' ? theme.colors.textInverse : '#FFFFFF',
+        headerStyle: {
+          backgroundColor: theme.scheme === 'deep' ? '#020B09' : theme.colors.primary,
+        },
+        headerTintColor:
+          theme.scheme === 'deep'
+            ? theme.colors.primarySoft
+            : theme.scheme === 'dark'
+              ? theme.colors.textInverse
+              : '#FFFFFF',
         headerTitleStyle: { fontWeight: '700' },
         contentStyle: { backgroundColor: theme.colors.bg },
       }}

@@ -10,7 +10,7 @@ import { useColorScheme } from 'react-native';
 import { storage } from '@/services/supabase';
 import { setAnalyticsEnabled, track } from '@/services/analytics';
 import { setLanguage as applyLanguage, initI18n } from '@/i18n';
-import { buildTheme, type Theme } from '@/theme';
+import { buildTheme, DEEP_NAVIGATION, type Theme } from '@/theme';
 import { limitsFor } from '@/config/limits';
 import type {
   CheckIn,
@@ -139,15 +139,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (ready) void storage.set('appState', state);
   }, [state, ready]);
 
-  const scheme = useColorScheme();
+  const systemScheme = useColorScheme();
+  const scheme = DEEP_NAVIGATION ? 'deep' : systemScheme === 'dark' ? 'dark' : 'light';
   const theme = useMemo(
-    () =>
-      buildTheme(
-        state.simpleMode,
-        scheme === 'dark' ? 'dark' : 'light',
-        state.highContrast,
-        state.dyslexiaMode
-      ),
+    () => buildTheme(state.simpleMode, scheme, state.highContrast, state.dyslexiaMode),
     [state.simpleMode, scheme, state.highContrast, state.dyslexiaMode]
   );
   const limits = useMemo(() => limitsFor(state.tier), [state.tier]);

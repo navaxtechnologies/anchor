@@ -9,6 +9,7 @@ import { ResourceCard } from '@/components/ResourceCard';
 import { MoodSelector } from '@/components/MoodSelector';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { Toast } from '@/components/Toast';
+import { VoidBackground } from '@/components/deep/VoidBackground';
 import { useApp, useTheme } from '@/context/AppContext';
 import { getResource } from '@/data/resources';
 import { listDocuments } from '@/services/vault';
@@ -329,9 +330,12 @@ export default function Home() {
     });
   };
 
+  const deep = theme.scheme === 'deep';
+
   return (
     <>
       <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: theme.colors.bg }}>
+        {deep && <VoidBackground />}
         <ScrollView
           contentContainerStyle={{ padding: theme.spacing.md, gap: theme.spacing.md }}
           keyboardShouldPersistTaps="handled"

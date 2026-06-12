@@ -17,8 +17,10 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: theme.colors.primary },
-        headerTintColor: theme.colors.textInverse,
+        headerStyle: {
+          backgroundColor: theme.scheme === 'deep' ? '#020B09' : theme.colors.primary,
+        },
+        headerTintColor: theme.scheme === 'deep' ? theme.colors.primarySoft : theme.colors.textInverse,
         headerTitleStyle: { fontWeight: '700' },
         // The crisis affordance is present in the header of every main screen.
         headerRight: () => <CrisisButton compact />,

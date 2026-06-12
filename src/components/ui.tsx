@@ -91,7 +91,7 @@ export function Button({
     gold: colors.gold,
   };
   const fg: Record<NonNullable<ButtonProps['variant']>, string> = {
-    primary: theme.scheme === 'dark' ? colors.textInverse : '#FFFFFF',
+    primary: theme.scheme === 'light' ? '#FFFFFF' : colors.textInverse,
     secondary: colors.primary,
     crisis: '#FFFFFF',
     emergency: '#FFFFFF',
@@ -147,6 +147,15 @@ export function Button({
         {variant === 'primary' && !disabled && theme.scheme === 'light' && (
           <LinearGradient
             colors={Gradients.anchorDeep as unknown as [string, string]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          />
+        )}
+        {/* Deep Navigation — biolume burn on the primary CTA. */}
+        {variant === 'primary' && !disabled && theme.scheme === 'deep' && (
+          <LinearGradient
+            colors={['#00E5CC', '#009E8A']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}

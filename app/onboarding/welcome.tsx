@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button } from '@/components/ui';
 import { WaveBackground } from '@/components/WaveBackground';
 import { ParticleField } from '@/components/ParticleField';
+import { VoidBackground } from '@/components/deep/VoidBackground';
+import { BiolumePulseRing } from '@/components/deep/BiolumePulseRing';
 import { useTheme } from '@/context/AppContext';
 import { useFadeIn } from '@/hooks/useAnimation';
 import { track } from '@/services/analytics';
@@ -42,14 +44,22 @@ export default function Welcome() {
     </View>
   );
 
+  const deep = theme.scheme === 'deep';
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.bg }}>
-      <WaveBackground />
-      <ParticleField intensity="medium" />
+      {deep ? <VoidBackground /> : <WaveBackground />}
+      <ParticleField intensity={deep ? 'low' : 'medium'} />
       <View style={{ flex: 1, padding: theme.spacing.lg, justifyContent: 'space-between' }}>
         <View style={{ gap: theme.spacing.lg, marginTop: theme.spacing.xxl }}>
-          {/* Wordmark — hero weight, confident and unafraid. */}
+          {/* Wordmark — hero weight, confident and unafraid.
+              In Deep Navigation a sonar pulse ring breathes behind the mark. */}
           <Animated.View style={[heroEntry, { gap: theme.spacing.xs }]}>
+            {deep && (
+              <View style={{ position: 'absolute', left: -50, top: -70 }} pointerEvents="none">
+                <BiolumePulseRing size={240} />
+              </View>
+            )}
             <AppText
               weight="heavy"
               color={theme.colors.primary}
