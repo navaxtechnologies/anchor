@@ -24,9 +24,13 @@ export default function TabsLayout() {
         headerTitleStyle: { fontWeight: '700' },
         // The crisis affordance is present in the header of every main screen.
         headerRight: () => <CrisisButton compact />,
-        tabBarActiveTintColor: theme.colors.primary,
+        tabBarActiveTintColor: theme.scheme === 'deep' ? '#00E5CC' : theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.textMuted,
-        tabBarStyle: { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border },
+        tabBarStyle: {
+          backgroundColor: theme.scheme === 'deep' ? '#020B09' : theme.colors.surface,
+          borderTopColor: theme.scheme === 'deep' ? 'rgba(0,229,204,0.35)' : theme.colors.border,
+          borderTopWidth: theme.scheme === 'deep' ? 1 : undefined,
+        },
         tabBarLabelStyle: { fontSize: theme.simpleMode ? 14 : 11 },
       }}
     >

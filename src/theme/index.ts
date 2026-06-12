@@ -285,7 +285,7 @@ export const deepColors: ThemeColors = {
   textMuted: Biolume.light.mid,      // readable, not the spec's dim
   textInverse: Biolume.void.deepest, // dark text on bright biolume buttons
 
-  border: Biolume.void.rim,
+  border: 'rgba(0,229,204,0.28)',   // glowing rim — every card edge is biolume
   success: '#00E5A0',
   successSoft: 'rgba(0,229,160,0.14)',
   warning: Biolume.aurora.gold,

@@ -17,6 +17,7 @@ import { Gradients, Palette } from '@/theme';
 import { AppText, Button, Card } from '@/components/ui';
 import { Disclaimer } from '@/components/Disclaimer';
 import { ThinkingDots } from '@/components/ThinkingDots';
+import { VoidBackground } from '@/components/deep/VoidBackground';
 import { useApp, useTheme } from '@/context/AppContext';
 import { generateReply } from '@/services/claude';
 import { haptic } from '@/lib/haptics';
@@ -197,6 +198,7 @@ export default function Advisor() {
 
   return (
     <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: theme.colors.surfaceAlt }}>
+      {theme.scheme === 'deep' && <VoidBackground />}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

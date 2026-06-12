@@ -49,8 +49,8 @@ export function VoidBackground() {
         <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
           <Defs>
             <RadialGradient id="voidPulse" cx="50%" cy="42%" r="60%">
-              <Stop offset="0%" stopColor={Biolume.teal.bright} stopOpacity="0.10" />
-              <Stop offset="45%" stopColor={Biolume.teal.dim} stopOpacity="0.04" />
+              <Stop offset="0%" stopColor={Biolume.teal.bright} stopOpacity="0.18" />
+              <Stop offset="45%" stopColor={Biolume.teal.dim} stopOpacity="0.07" />
               <Stop offset="100%" stopColor={Biolume.void.deepest} stopOpacity="0" />
             </RadialGradient>
           </Defs>
@@ -59,7 +59,7 @@ export function VoidBackground() {
       </Animated.View>
 
       {/* Faint HUD grid — the signature instrument quality */}
-      <Svg width={width} height={height} style={[StyleSheet.absoluteFill, { opacity: 0.04 }]}>
+      <Svg width={width} height={height} style={[StyleSheet.absoluteFill, { opacity: 0.08 }]}>
         {Array.from({ length: cols }).map((_, i) => (
           <Line key={`v${i}`} x1={i * GRID} y1={0} x2={i * GRID} y2={height} stroke={Biolume.teal.core} strokeWidth={0.5} />
         ))}

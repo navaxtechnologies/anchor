@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/context/AppContext';
 import { Gradients } from '@/theme';
+import { VoidBackground } from '@/components/deep/VoidBackground';
 import { usePressScale, useStaggeredEntry } from '@/hooks/useAnimation';
 import { haptic } from '@/lib/haptics';
 
@@ -38,6 +39,11 @@ export function AppText({
   const theme = useTheme();
   const fontWeight: TextStyle['fontWeight'] =
     weight === 'heavy' ? '800' : weight === 'bold' ? '700' : weight === 'medium' ? '600' : '400';
+  // Deep Navigation: large headings carry a biolume halo — light from within.
+  const halo: TextStyle =
+    theme.scheme === 'deep' && (size === 'display' || size === 'title')
+      ? { textShadowColor: 'rgba(0,229,204,0.45)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 14 }
+      : {};
   return (
     <Text
       style={[
@@ -49,6 +55,7 @@ export function AppText({
           textAlign: center ? 'center' : 'left',
           letterSpacing:
             theme.letterSpacing || (size === 'display' || size === 'title' ? -0.3 : 0),
+          ...halo,
         },
         style,
       ]}
@@ -194,21 +201,31 @@ export function Card({
   const entry = useStaggeredEntry(fadeIndex ?? 0);
   const { onPressIn, onPressOut, pressStyle } = usePressScale(0.98);
 
-  const shadow: ViewStyle = elevated
-    ? {
-        shadowColor: theme.colors.primarySoft,
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.14,
-        shadowRadius: 20,
-        elevation: 6,
-      }
-    : {
-        shadowColor: '#111110',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
-        elevation: 3,
-      };
+  // Deep Navigation: cards glow from within — teal halo instead of a drop shadow.
+  const shadow: ViewStyle =
+    theme.scheme === 'deep'
+      ? {
+          shadowColor: '#00E5CC',
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: elevated ? 0.35 : 0.18,
+          shadowRadius: elevated ? 22 : 14,
+          elevation: elevated ? 8 : 4,
+        }
+      : elevated
+        ? {
+            shadowColor: theme.colors.primarySoft,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.14,
+            shadowRadius: 20,
+            elevation: 6,
+          }
+        : {
+            shadowColor: '#111110',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.06,
+            shadowRadius: 12,
+            elevation: 3,
+          };
 
   const cardStyle: StyleProp<ViewStyle> = [
     {
@@ -308,6 +325,8 @@ export function ScreenContainer({
       edges={['bottom']}
       style={{ flex: 1, backgroundColor: backgroundColor ?? theme.colors.bg }}
     >
+      {/* Deep Navigation: every screen sits inside the living void. */}
+      {theme.scheme === 'deep' && <VoidBackground />}
       {scroll ? (
         <ScrollView contentContainerStyle={inner} keyboardShouldPersistTaps="handled">
           {children}
